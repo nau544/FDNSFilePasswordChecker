@@ -17,6 +17,28 @@ namespace FDNSFilePasswordChecker
         public Form1()
         {
             InitializeComponent();
+            this.Resize += Form1_Resize;
+            CenterSubmitButton();
+        }
+
+        /// <summary>
+        /// フォームのリサイズイベントハンドラー
+        /// </summary>
+        /// <param name="sender">イベントの送信元オブジェクト</param>
+        /// <param name="e">イベント引数</param>
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            CenterSubmitButton();
+        }
+
+        /// <summary>
+        /// 実行ボタンを中央に配置する
+        /// </summary>
+        private void CenterSubmitButton()
+        {
+            // 実行ボタンを水平方向の中央に配置
+            int centerX = (this.ClientSize.Width - btnSubmit.Width) / 2;
+            btnSubmit.Location = new Point(centerX, btnSubmit.Location.Y);
         }
 
         /// <summary>
@@ -54,63 +76,67 @@ namespace FDNSFilePasswordChecker
                     return;
                 }
 
-                // exeファイルのパスを設定
-                string exePath1 = Path.Combine(Application.StartupPath, "FPCCmd.exe");
-                string exePath2 = Path.Combine(Application.StartupPath, "FPCNOCmd.exe");
+                // バッチファイルのパスを設定
+                string batchPath = Path.Combine(Application.StartupPath, "fpc_1_3_0", "00.パスワードファイルチェッカー.bat");
                 
-                // exeファイルの存在確認
-                if (!File.Exists(exePath1))
+                // バッチファイルの存在確認
+                if (!File.Exists(batchPath))
                 {
-                    MessageBox.Show($"実行ファイルが見つかりません: {exePath1}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
-                if (!File.Exists(exePath2))
-                {
-                    MessageBox.Show($"実行ファイルが見つかりません: {exePath2}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"バッチファイルが見つかりません: {batchPath}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 // プロセス開始情報を設定
-                ProcessStartInfo startInfo1 = new ProcessStartInfo();
-                startInfo1.FileName = exePath1;
-                startInfo1.Arguments = $"\"{txtSourceFolder.Text}\" \"{txtOutputFolder.Text}\"";
+                ProcessStartInfo startInfo = new ProcessStartInfo();
+                startInfo.FileName = batchPath;  // バッチファイルを直接実行
+                startInfo.WorkingDirectory = Path.Combine(Application.StartupPath, "fpc_1_3_0");  // fpc_1_3_0フォルダを作業ディレクトリに設定
                 
-                ProcessStartInfo startInfo2 = new ProcessStartInfo();
-                startInfo2.FileName = exePath2;
-                startInfo2.Arguments = $"\"{txtSourceFolder.Text}\" \"{txtOutputFolder.Text}\"";
+                // 引数を適切にエスケープして設定
+                string arguments = $"\"{txtSourceFolder.Text}\" \"{txtOutputFolder.Text}\"";
                 
                 // チェックボックスの状態に応じて引数を追加
                 if (chkExcludePasswordFolders.Checked)
                 {
-                    startInfo1.Arguments += " --exclude-password";
-                    startInfo2.Arguments += " --exclude-password";
-                }
-
-                // 両方のプロセスを同時に開始
-                using (Process process1 = new Process())
-                using (Process process2 = new Process())
-                {
-                    process1.StartInfo = startInfo1;
-                    process2.StartInfo = startInfo2;
-                    
-                    // 同時並行で実行
-                    process1.Start();
-                    process2.Start();
-                    
-                    // プロセスの終了を待機（オプション）
-                    // process1.WaitForExit();
-                    // process2.WaitForExit();
-                }
-
-                // 成功メッセージを表示
-                string message = "FPCCmd.exeとFPCNOCmd.exeを同時に開始しました！";
-                if (chkExcludePasswordFolders.Checked)
-                {
-                    message += "\n(パスワード付きファイルは除外されています)";
+                    arguments += " --exclude-password";
                 }
                 
-                MessageBox.Show(message, "実行", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                startInfo.Arguments = arguments;
+                startInfo.UseShellExecute = false;  // シェル実行を無効化
+                startInfo.RedirectStandardOutput = true;  // 標準出力をリダイレクト
+                startInfo.RedirectStandardError = true;   // 標準エラーをリダイレクト
+                startInfo.CreateNoWindow = false;  // ウィンドウを表示
+                
+                // バッチファイルを実行
+                using (Process process = new Process())
+                {
+                    process.StartInfo = startInfo;
+                    process.Start();
+                    
+                    // プロセスの終了を待機（エラー確認のため）
+                    process.WaitForExit();
+                    
+                    // エラー内容を確認
+                    string error = process.StandardError.ReadToEnd();
+                    string output = process.StandardOutput.ReadToEnd();
+                    
+                    if (!string.IsNullOrEmpty(error))
+                    {
+                        string errorMessage = "実行中にエラーが発生しました:\n\n";
+                        errorMessage += $"バッチファイル:\n{error}";
+                        MessageBox.Show(errorMessage, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else
+                    {
+                        // 成功メッセージを表示
+                        string message = "00.パスワードファイルチェッカー.batを開始しました！";
+                        if (chkExcludePasswordFolders.Checked)
+                        {
+                            message += "\n(パスワード付きファイルは除外されています)";
+                        }
+                        
+                        MessageBox.Show(message, "実行", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
             }
             catch (Exception ex)
             {
