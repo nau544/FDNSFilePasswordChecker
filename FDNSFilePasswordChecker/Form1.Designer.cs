@@ -43,9 +43,54 @@
         private System.Windows.Forms.Button btnBrowseOutput;
 
         /// <summary>
+        /// ログ出力先2（PDF）のラベル
+        /// </summary>
+        private System.Windows.Forms.Label lblOutputFolder2;
+
+        /// <summary>
+        /// ログ出力先2（PDF）のテキストボックス
+        /// </summary>
+        private System.Windows.Forms.TextBox txtOutputFolder2;
+
+        /// <summary>
+        /// ログ出力先2（PDF）の参照ボタン
+        /// </summary>
+        private System.Windows.Forms.Button btnBrowseOutput2;
+
+        /// <summary>
+        /// 複写先ファイルのラベル
+        /// </summary>
+        private System.Windows.Forms.Label lblCopyDestination;
+
+        /// <summary>
+        /// 複写先ファイルのテキストボックス
+        /// </summary>
+        private System.Windows.Forms.TextBox txtCopyDestination;
+
+        /// <summary>
+        /// 複写先ファイルの参照ボタン
+        /// </summary>
+        private System.Windows.Forms.Button btnBrowseCopyDestination;
+
+        /// <summary>
         /// パスワード付きフォルダを除外するチェックボックス
         /// </summary>
         private System.Windows.Forms.CheckBox chkExcludePasswordFolders;
+
+        /// <summary>
+        /// 結果を出力しないチェックボックス
+        /// </summary>
+        private System.Windows.Forms.CheckBox chkNoOutput;
+
+        /// <summary>
+        /// コメントを出力しないチェックボックス
+        /// </summary>
+        private System.Windows.Forms.CheckBox chkNoComment;
+
+        /// <summary>
+        /// 出力結果の文字をダブルクォーテーションで囲むチェックボックス
+        /// </summary>
+        private System.Windows.Forms.CheckBox chkDoubleQuote;
 
         /// <summary>
         /// タイトルラベル
@@ -80,7 +125,16 @@
             this.lblOutputFolder = new System.Windows.Forms.Label();
             this.txtOutputFolder = new System.Windows.Forms.TextBox();
             this.btnBrowseOutput = new System.Windows.Forms.Button();
+            this.lblOutputFolder2 = new System.Windows.Forms.Label();
+            this.txtOutputFolder2 = new System.Windows.Forms.TextBox();
+            this.btnBrowseOutput2 = new System.Windows.Forms.Button();
+            this.lblCopyDestination = new System.Windows.Forms.Label();
+            this.txtCopyDestination = new System.Windows.Forms.TextBox();
+            this.btnBrowseCopyDestination = new System.Windows.Forms.Button();
             this.chkExcludePasswordFolders = new System.Windows.Forms.CheckBox();
+            this.chkNoOutput = new System.Windows.Forms.CheckBox();
+            this.chkNoComment = new System.Windows.Forms.CheckBox();
+            this.chkDoubleQuote = new System.Windows.Forms.CheckBox();
             this.lblTitle = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -148,7 +202,7 @@
             this.lblOutputFolder.Name = "lblOutputFolder";
             this.lblOutputFolder.Size = new System.Drawing.Size(65, 12);
             this.lblOutputFolder.TabIndex = 4;
-            this.lblOutputFolder.Text = "ログ出力先：";
+            this.lblOutputFolder.Text = "ログ出力先1（office）：";
             // 
             // txtOutputFolder
             // 
@@ -176,6 +230,84 @@
             this.btnBrowseOutput.UseVisualStyleBackColor = false;
             this.btnBrowseOutput.Click += new System.EventHandler(this.btnBrowseOutput_Click);
             // 
+            // lblOutputFolder2
+            // 
+            this.lblOutputFolder2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblOutputFolder2.AutoSize = true;
+            this.lblOutputFolder2.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblOutputFolder2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.lblOutputFolder2.Location = new System.Drawing.Point(20, 200);
+            this.lblOutputFolder2.Name = "lblOutputFolder2";
+            this.lblOutputFolder2.Size = new System.Drawing.Size(65, 12);
+            this.lblOutputFolder2.TabIndex = 7;
+            this.lblOutputFolder2.Text = "ログ出力先2（PDF）：";
+            // 
+            // txtOutputFolder2
+            // 
+            this.txtOutputFolder2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtOutputFolder2.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtOutputFolder2.Location = new System.Drawing.Point(120, 220);
+            this.txtOutputFolder2.Name = "txtOutputFolder2";
+            this.txtOutputFolder2.Size = new System.Drawing.Size(580, 25);
+            this.txtOutputFolder2.TabIndex = 8;
+            // 
+            // btnBrowseOutput2
+            // 
+            this.btnBrowseOutput2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnBrowseOutput2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.btnBrowseOutput2.FlatAppearance.BorderSize = 0;
+            this.btnBrowseOutput2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBrowseOutput2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBrowseOutput2.ForeColor = System.Drawing.Color.White;
+            this.btnBrowseOutput2.Location = new System.Drawing.Point(20, 218);
+            this.btnBrowseOutput2.Name = "btnBrowseOutput2";
+            this.btnBrowseOutput2.Size = new System.Drawing.Size(90, 29);
+            this.btnBrowseOutput2.TabIndex = 9;
+            this.btnBrowseOutput2.Text = "参照";
+            this.btnBrowseOutput2.UseVisualStyleBackColor = false;
+            this.btnBrowseOutput2.Click += new System.EventHandler(this.btnBrowseOutput2_Click);
+            // 
+            // lblCopyDestination
+            // 
+            this.lblCopyDestination.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblCopyDestination.AutoSize = true;
+            this.lblCopyDestination.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCopyDestination.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.lblCopyDestination.Location = new System.Drawing.Point(20, 260);
+            this.lblCopyDestination.Name = "lblCopyDestination";
+            this.lblCopyDestination.Size = new System.Drawing.Size(65, 12);
+            this.lblCopyDestination.TabIndex = 10;
+            this.lblCopyDestination.Text = "複写先ファイル：";
+            // 
+            // txtCopyDestination
+            // 
+            this.txtCopyDestination.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtCopyDestination.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtCopyDestination.Location = new System.Drawing.Point(120, 280);
+            this.txtCopyDestination.Name = "txtCopyDestination";
+            this.txtCopyDestination.Size = new System.Drawing.Size(580, 25);
+            this.txtCopyDestination.TabIndex = 11;
+            // 
+            // btnBrowseCopyDestination
+            // 
+            this.btnBrowseCopyDestination.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnBrowseCopyDestination.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            this.btnBrowseCopyDestination.FlatAppearance.BorderSize = 0;
+            this.btnBrowseCopyDestination.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnBrowseCopyDestination.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnBrowseCopyDestination.ForeColor = System.Drawing.Color.White;
+            this.btnBrowseCopyDestination.Location = new System.Drawing.Point(20, 278);
+            this.btnBrowseCopyDestination.Name = "btnBrowseCopyDestination";
+            this.btnBrowseCopyDestination.Size = new System.Drawing.Size(90, 29);
+            this.btnBrowseCopyDestination.TabIndex = 12;
+            this.btnBrowseCopyDestination.Text = "参照";
+            this.btnBrowseCopyDestination.UseVisualStyleBackColor = false;
+            this.btnBrowseCopyDestination.Click += new System.EventHandler(this.btnBrowseCopyDestination_Click);
+            // 
             // chkExcludePasswordFolders
             // 
             this.chkExcludePasswordFolders.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -183,12 +315,54 @@
             this.chkExcludePasswordFolders.AutoSize = true;
             this.chkExcludePasswordFolders.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.chkExcludePasswordFolders.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.chkExcludePasswordFolders.Location = new System.Drawing.Point(20, 200);
+            this.chkExcludePasswordFolders.Location = new System.Drawing.Point(20, 320);
             this.chkExcludePasswordFolders.Name = "chkExcludePasswordFolders";
             this.chkExcludePasswordFolders.Size = new System.Drawing.Size(180, 16);
-            this.chkExcludePasswordFolders.TabIndex = 7;
+            this.chkExcludePasswordFolders.TabIndex = 13;
             this.chkExcludePasswordFolders.Text = "パスワード付きフォルダを除外する";
             this.chkExcludePasswordFolders.UseVisualStyleBackColor = true;
+            // 
+            // chkNoOutput
+            // 
+            this.chkNoOutput.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkNoOutput.AutoSize = true;
+            this.chkNoOutput.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkNoOutput.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.chkNoOutput.Location = new System.Drawing.Point(20, 350);
+            this.chkNoOutput.Name = "chkNoOutput";
+            this.chkNoOutput.Size = new System.Drawing.Size(180, 16);
+            this.chkNoOutput.TabIndex = 14;
+            this.chkNoOutput.Text = "結果を出力しない";
+            this.chkNoOutput.UseVisualStyleBackColor = true;
+            // 
+            // chkNoComment
+            // 
+            this.chkNoComment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkNoComment.AutoSize = true;
+            this.chkNoComment.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkNoComment.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.chkNoComment.Location = new System.Drawing.Point(20, 380);
+            this.chkNoComment.Name = "chkNoComment";
+            this.chkNoComment.Size = new System.Drawing.Size(180, 16);
+            this.chkNoComment.TabIndex = 15;
+            this.chkNoComment.Text = "コメントを出力しない";
+            this.chkNoComment.UseVisualStyleBackColor = true;
+            // 
+            // chkDoubleQuote
+            // 
+            this.chkDoubleQuote.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.chkDoubleQuote.AutoSize = true;
+            this.chkDoubleQuote.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.chkDoubleQuote.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.chkDoubleQuote.Location = new System.Drawing.Point(20, 410);
+            this.chkDoubleQuote.Name = "chkDoubleQuote";
+            this.chkDoubleQuote.Size = new System.Drawing.Size(280, 16);
+            this.chkDoubleQuote.TabIndex = 16;
+            this.chkDoubleQuote.Text = "出力結果の文字をダブルクォーテーションで囲む";
+            this.chkDoubleQuote.UseVisualStyleBackColor = true;
             // 
             // btnSubmit
             // 
@@ -198,7 +372,7 @@
             this.btnSubmit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnSubmit.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSubmit.ForeColor = System.Drawing.Color.White;
-            this.btnSubmit.Location = new System.Drawing.Point(340, 240);
+            this.btnSubmit.Location = new System.Drawing.Point(340, 450);
             this.btnSubmit.Name = "btnSubmit";
             this.btnSubmit.Size = new System.Drawing.Size(120, 40);
             this.btnSubmit.TabIndex = 0;
@@ -214,6 +388,15 @@
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.lblTitle);
             this.Controls.Add(this.chkExcludePasswordFolders);
+            this.Controls.Add(this.chkNoOutput);
+            this.Controls.Add(this.chkNoComment);
+            this.Controls.Add(this.chkDoubleQuote);
+            this.Controls.Add(this.btnBrowseCopyDestination);
+            this.Controls.Add(this.txtCopyDestination);
+            this.Controls.Add(this.lblCopyDestination);
+            this.Controls.Add(this.btnBrowseOutput2);
+            this.Controls.Add(this.txtOutputFolder2);
+            this.Controls.Add(this.lblOutputFolder2);
             this.Controls.Add(this.btnBrowseOutput);
             this.Controls.Add(this.txtOutputFolder);
             this.Controls.Add(this.lblOutputFolder);
@@ -221,7 +404,7 @@
             this.Controls.Add(this.txtSourceFolder);
             this.Controls.Add(this.lblSourceFolder);
             this.Controls.Add(this.btnSubmit);
-            this.MinimumSize = new System.Drawing.Size(600, 400);
+            this.MinimumSize = new System.Drawing.Size(600, 550);
             this.Name = "Form1";
             this.Text = "PasswordChecker";
             this.ResumeLayout(false);

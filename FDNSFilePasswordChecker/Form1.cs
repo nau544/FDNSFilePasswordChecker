@@ -97,23 +97,50 @@ namespace FDNSFilePasswordChecker
                 ProcessStartInfo startInfo1 = new ProcessStartInfo();
                 startInfo1.FileName = "cmd.exe";
                 startInfo1.WorkingDirectory = Path.Combine(Application.StartupPath, "fpc_1_3_0");  // fpc_1_3_0フォルダを作業ディレクトリに設定
-                startInfo1.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCCmd.exe /l:\"{txtOutputFolder.Text}\\FPCCmd.log\" /c:\"{txtSourceFolder.Text}\" & PAUSE\"";
                 startInfo1.UseShellExecute = true;  // シェル実行を有効化
                 startInfo1.CreateNoWindow = false;  // ウィンドウを表示
                 
                 ProcessStartInfo startInfo2 = new ProcessStartInfo();
                 startInfo2.FileName = "cmd.exe";
                 startInfo2.WorkingDirectory = Path.Combine(Application.StartupPath, "fpc_1_3_0");  // fpc_1_3_0フォルダを作業ディレクトリに設定
-                startInfo2.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCNOCmd.exe -l \"{txtOutputFolder.Text}\\FPCNOCmd.log\" -c \"{txtSourceFolder.Text}\" & PAUSE\"";
                 startInfo2.UseShellExecute = true;  // シェル実行を有効化
                 startInfo2.CreateNoWindow = false;  // ウィンドウを表示
                 
                 // チェックボックスの状態に応じて引数を追加
+                string options1 = "";  // FPCCmd.exe用のオプション
+                string options2 = "";  // FPCNOCmd.exe用のオプション
+
+                // パスワード付きフォルダを除外するオプション
                 if (chkExcludePasswordFolders.Checked)
                 {
-                    startInfo1.Arguments += " --exclude-password";
-                    startInfo2.Arguments += " --exclude-password";
+                    options1 += " --exclude-password";
+                    options2 += " --exclude-password";
                 }
+
+                // 結果を出力しないオプション (USE_SM)
+                if (chkNoOutput.Checked)
+                {
+                    options1 += " /sm";
+                    options2 += " --sm";
+                }
+
+                // コメントを出力しないオプション (USE_NC)
+                if (chkNoComment.Checked)
+                {
+                    options1 += " /nc";
+                    options2 += " --nc";
+                }
+
+                // 出力結果の文字をダブルクォーテーションで囲むオプション (USE_DQ)
+                if (chkDoubleQuote.Checked)
+                {
+                    options1 += " /dq";
+                    options2 += " --dq";
+                }
+
+                // オプションを引数に追加
+                startInfo1.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCCmd.exe /l:\"{txtOutputFolder.Text}\\FPCCmd.log\" /c:\"{txtSourceFolder.Text}\"{options1} & PAUSE\"";
+                startInfo2.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCNOCmd.exe -l \"{txtOutputFolder2.Text}\\FPCNOCmd.log\" -c \"{txtSourceFolder.Text}\"{options2} & PAUSE\"";
 
                 // 両方のプロセスを同時に開始
                 using (Process process1 = new Process())
@@ -176,6 +203,44 @@ namespace FDNSFilePasswordChecker
                 if (folderDialog.ShowDialog() == DialogResult.OK)
                 {
                     txtOutputFolder.Text = folderDialog.SelectedPath;
+                }
+            }
+        }
+
+        /// <summary>
+        /// ログ出力先2（PDF）の参照ボタンのクリックイベントハンドラー
+        /// </summary>
+        /// <param name="sender">イベントの送信元オブジェクト</param>
+        /// <param name="e">イベント引数</param>
+        private void btnBrowseOutput2_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
+            {
+                folderDialog.Description = "ログ出力先2（PDF）フォルダを指定してください";
+                folderDialog.ShowNewFolderButton = true;
+                
+                if (folderDialog.ShowDialog() == DialogResult.OK)
+                {
+                    txtOutputFolder2.Text = folderDialog.SelectedPath;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 複写先ファイルの参照ボタンのクリックイベントハンドラー
+        /// </summary>
+        /// <param name="sender">イベントの送信元オブジェクト</param>
+        /// <param name="e">イベント引数</param>
+        private void btnBrowseCopyDestination_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
+            {
+                folderDialog.Description = "複写先ファイルフォルダを指定してください";
+                folderDialog.ShowNewFolderButton = true;
+                
+                if (folderDialog.ShowDialog() == DialogResult.OK)
+                {
+                    txtCopyDestination.Text = folderDialog.SelectedPath;
                 }
             }
         }
