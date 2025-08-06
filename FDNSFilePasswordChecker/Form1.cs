@@ -213,6 +213,12 @@ namespace FDNSFilePasswordChecker
                     string message = "FPCCmd.exeとFPCNOCmd.exeの実行が完了しました！";
                     message += "\nPRファイルの自動コピーも完了しました。";
                     
+                    // 削除機能が有効な場合のメッセージを追加
+                    if (chkDeleteSourceFiles.Checked)
+                    {
+                        message += "\n複写元フォルダからのPRファイル削除も完了しました。";
+                    }
+                    
                     MessageBox.Show(message, "実行完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
@@ -309,15 +315,24 @@ namespace FDNSFilePasswordChecker
         {
             try
             {
+                // 削除対象のファイルリストを保持
+                List<string> filesToDelete = new List<string>();
+                
                 // ログファイルからPRファイルを抽出してコピー
                 if (File.Exists(txtOutputFolder.Text))
                 {
-                    await ProcessLogFileAsync(txtOutputFolder.Text);
+                    await ProcessLogFileAsync(txtOutputFolder.Text, filesToDelete);
                 }
                 
                 if (File.Exists(txtOutputFolder2.Text))
                 {
-                    await ProcessLogFileAsync(txtOutputFolder2.Text);
+                    await ProcessLogFileAsync(txtOutputFolder2.Text, filesToDelete);
+                }
+                
+                // チェックボックスがチェックされている場合、複写元フォルダからPRファイルを削除
+                if (chkDeleteSourceFiles.Checked && filesToDelete.Count > 0)
+                {
+                    await DeleteSourceFilesAsync(filesToDelete);
                 }
             }
             catch (Exception ex)
@@ -330,7 +345,8 @@ namespace FDNSFilePasswordChecker
         /// ログファイルを解析してPRファイルをコピーする
         /// </summary>
         /// <param name="logFilePath">ログファイルのパス</param>
-        private async Task ProcessLogFileAsync(string logFilePath)
+        /// <param name="filesToDelete">削除対象のファイルリスト（出力パラメータ）</param>
+        private async Task ProcessLogFileAsync(string logFilePath, List<string> filesToDelete)
         {
             try
             {
@@ -350,6 +366,7 @@ namespace FDNSFilePasswordChecker
                             if (status == "PR" && File.Exists(filePath))
                             {
                                 await CopyFileWithRelativePathAsync(filePath);
+                                filesToDelete.Add(filePath); // コピーしたファイルを削除リストに追加
                             }
                         }
                     }
@@ -391,6 +408,36 @@ namespace FDNSFilePasswordChecker
             catch (Exception ex)
             {
                 Console.WriteLine($"ファイルコピーエラー ({sourceFilePath}): {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 複写元フォルダから指定されたファイルを削除する
+        /// </summary>
+        /// <param name="filesToDelete">削除対象のファイルパスリスト</param>
+        private async Task DeleteSourceFilesAsync(List<string> filesToDelete)
+        {
+            try
+            {
+                foreach (string filePath in filesToDelete)
+                {
+                    string relativePath = GetRelativePath(txtSourceFolder.Text, filePath);
+                    string fullPathToDelete = Path.Combine(txtSourceFolder.Text, relativePath);
+
+                    if (File.Exists(fullPathToDelete))
+                    {
+                        await Task.Run(() => File.Delete(fullPathToDelete));
+                        Console.WriteLine($"削除完了: {relativePath}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"削除対象ファイルが見つかりません: {relativePath}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"複写元フォルダからのファイル削除中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
