@@ -164,12 +164,7 @@ namespace FDNSFilePasswordChecker
                 string options1 = "";  // FPCCmd.exe用のオプション
                 string options2 = "";  // FPCNOCmd.exe用のオプション
 
-                // パスワード付きフォルダを除外するオプション
-                if (chkExcludePasswordFolders.Checked)
-                {
-                    options1 += " --exclude-password";
-                    options2 += " --exclude-password";
-                }
+
 
                 // 結果を出力しないオプション (USE_SM)
                 if (chkNoOutput.Checked)
@@ -216,10 +211,6 @@ namespace FDNSFilePasswordChecker
                     
                     // 成功メッセージを表示
                     string message = "FPCCmd.exeとFPCNOCmd.exeの実行が完了しました！";
-                    if (chkExcludePasswordFolders.Checked)
-                    {
-                        message += "\n(複写元フォルダからパスワード付きファイルが削除されます)";
-                    }
                     message += "\nPRファイルの自動コピーも完了しました。";
                     
                     MessageBox.Show(message, "実行完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
