@@ -58,17 +58,17 @@
         private System.Windows.Forms.Button btnBrowseOutput2;
 
         /// <summary>
-        /// 複写先ファイルのラベル
+        /// 複写先フォルダのラベル
         /// </summary>
         private System.Windows.Forms.Label lblCopyDestination;
 
         /// <summary>
-        /// 複写先ファイルのテキストボックス
+        /// 複写先フォルダのテキストボックス
         /// </summary>
         private System.Windows.Forms.TextBox txtCopyDestination;
 
         /// <summary>
-        /// 複写先ファイルの参照ボタン
+        /// 複写先フォルダの参照ボタン
         /// </summary>
         private System.Windows.Forms.Button btnBrowseCopyDestination;
 
@@ -280,7 +280,7 @@
             this.lblCopyDestination.Name = "lblCopyDestination";
             this.lblCopyDestination.Size = new System.Drawing.Size(65, 12);
             this.lblCopyDestination.TabIndex = 10;
-            this.lblCopyDestination.Text = "複写先ファイル：";
+            this.lblCopyDestination.Text = "複写先フォルダ：";
             // 
             // txtCopyDestination
             // 

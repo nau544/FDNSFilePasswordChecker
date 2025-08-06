@@ -19,6 +19,9 @@ namespace FDNSFilePasswordChecker
             InitializeComponent();
             this.Resize += Form1_Resize;
             CenterSubmitButton();
+            
+            // ボタンのマウスイベントハンドラーを設定（ホバー時にカーソルをポインターに変更）
+            SetupButtonHoverEffects();
         }
 
         /// <summary>
@@ -42,6 +45,29 @@ namespace FDNSFilePasswordChecker
         }
 
         /// <summary>
+        /// ボタンのホバー効果を設定する
+        /// </summary>
+        private void SetupButtonHoverEffects()
+        {
+            // 実行ボタンのホバー効果
+            btnSubmit.MouseEnter += (sender, e) => { btnSubmit.Cursor = Cursors.Hand; };
+            btnSubmit.MouseLeave += (sender, e) => { btnSubmit.Cursor = Cursors.Default; };
+
+            // 参照ボタンのホバー効果
+            btnBrowseSource.MouseEnter += (sender, e) => { btnBrowseSource.Cursor = Cursors.Hand; };
+            btnBrowseSource.MouseLeave += (sender, e) => { btnBrowseSource.Cursor = Cursors.Default; };
+
+            btnBrowseOutput.MouseEnter += (sender, e) => { btnBrowseOutput.Cursor = Cursors.Hand; };
+            btnBrowseOutput.MouseLeave += (sender, e) => { btnBrowseOutput.Cursor = Cursors.Default; };
+
+            btnBrowseOutput2.MouseEnter += (sender, e) => { btnBrowseOutput2.Cursor = Cursors.Hand; };
+            btnBrowseOutput2.MouseLeave += (sender, e) => { btnBrowseOutput2.Cursor = Cursors.Default; };
+
+            btnBrowseCopyDestination.MouseEnter += (sender, e) => { btnBrowseCopyDestination.Cursor = Cursors.Hand; };
+            btnBrowseCopyDestination.MouseLeave += (sender, e) => { btnBrowseCopyDestination.Cursor = Cursors.Default; };
+        }
+
+        /// <summary>
         /// 実行ボタンのクリックイベントハンドラー
         /// </summary>
         /// <param name="sender">イベントの送信元オブジェクト</param>
@@ -59,7 +85,19 @@ namespace FDNSFilePasswordChecker
 
                 if (string.IsNullOrWhiteSpace(txtOutputFolder.Text))
                 {
-                    MessageBox.Show("ログ出力先を指定してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("ログ出力先1（office）を指定してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(txtOutputFolder2.Text))
+                {
+                    MessageBox.Show("ログ出力先2（PDF）を指定してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(txtCopyDestination.Text))
+                {
+                    MessageBox.Show("複写先フォルダを指定してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
@@ -70,9 +108,25 @@ namespace FDNSFilePasswordChecker
                     return;
                 }
 
-                if (!Directory.Exists(txtOutputFolder.Text))
+                // ログ出力先1はファイルパスなので、親ディレクトリの存在確認を行う
+                string outputDir1 = Path.GetDirectoryName(txtOutputFolder.Text);
+                if (!Directory.Exists(outputDir1))
                 {
-                    MessageBox.Show("指定されたログ出力先が存在しません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("指定されたログ出力先1（office）の保存先フォルダが存在しません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // ログ出力先2はファイルパスなので、親ディレクトリの存在確認を行う
+                string outputDir2 = Path.GetDirectoryName(txtOutputFolder2.Text);
+                if (!Directory.Exists(outputDir2))
+                {
+                    MessageBox.Show("指定されたログ出力先2（PDF）の保存先フォルダが存在しません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (!Directory.Exists(txtCopyDestination.Text))
+                {
+                    MessageBox.Show("指定された複写先フォルダが存在しません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
@@ -139,8 +193,8 @@ namespace FDNSFilePasswordChecker
                 }
 
                 // オプションを引数に追加
-                startInfo1.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCCmd.exe /l:\"{txtOutputFolder.Text}\\FPCCmd.log\" /c:\"{txtSourceFolder.Text}\"{options1} & PAUSE\"";
-                startInfo2.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCNOCmd.exe -l \"{txtOutputFolder2.Text}\\FPCNOCmd.log\" -c \"{txtSourceFolder.Text}\"{options2} & PAUSE\"";
+                startInfo1.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCCmd.exe /l:\"{txtOutputFolder.Text}\" /c:\"{txtSourceFolder.Text}\"{options1} & PAUSE\"";
+                startInfo2.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCNOCmd.exe -l \"{txtOutputFolder2.Text}\" -c \"{txtSourceFolder.Text}\"{options2} & PAUSE\"";
 
                 // 両方のプロセスを同時に開始
                 using (Process process1 = new Process())
@@ -195,14 +249,16 @@ namespace FDNSFilePasswordChecker
         /// <param name="e">イベント引数</param>
         private void btnBrowseOutput_Click(object sender, EventArgs e)
         {
-            using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
+            using (SaveFileDialog saveDialog = new SaveFileDialog())
             {
-                folderDialog.Description = "ログ出力先フォルダを指定してください";
-                folderDialog.ShowNewFolderButton = true;
+                saveDialog.Title = "ログ出力先ファイルを指定してください";
+                saveDialog.Filter = "ログファイル (*.log)|*.log|テキストファイル (*.txt)|*.txt|すべてのファイル (*.*)|*.*";
+                saveDialog.DefaultExt = "log";
+                saveDialog.FileName = "FPCCmd.log";
                 
-                if (folderDialog.ShowDialog() == DialogResult.OK)
+                if (saveDialog.ShowDialog() == DialogResult.OK)
                 {
-                    txtOutputFolder.Text = folderDialog.SelectedPath;
+                    txtOutputFolder.Text = saveDialog.FileName;
                 }
             }
         }
@@ -214,20 +270,22 @@ namespace FDNSFilePasswordChecker
         /// <param name="e">イベント引数</param>
         private void btnBrowseOutput2_Click(object sender, EventArgs e)
         {
-            using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
+            using (SaveFileDialog saveDialog = new SaveFileDialog())
             {
-                folderDialog.Description = "ログ出力先2（PDF）フォルダを指定してください";
-                folderDialog.ShowNewFolderButton = true;
+                saveDialog.Title = "ログ出力先2（PDF）ファイルを指定してください";
+                saveDialog.Filter = "ログファイル (*.log)|*.log|テキストファイル (*.txt)|*.txt|すべてのファイル (*.*)|*.*";
+                saveDialog.DefaultExt = "log";
+                saveDialog.FileName = "FPCNOCmd.log";
                 
-                if (folderDialog.ShowDialog() == DialogResult.OK)
+                if (saveDialog.ShowDialog() == DialogResult.OK)
                 {
-                    txtOutputFolder2.Text = folderDialog.SelectedPath;
+                    txtOutputFolder2.Text = saveDialog.FileName;
                 }
             }
         }
 
         /// <summary>
-        /// 複写先ファイルの参照ボタンのクリックイベントハンドラー
+        /// 複写先フォルダの参照ボタンのクリックイベントハンドラー
         /// </summary>
         /// <param name="sender">イベントの送信元オブジェクト</param>
         /// <param name="e">イベント引数</param>
@@ -235,7 +293,7 @@ namespace FDNSFilePasswordChecker
         {
             using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
             {
-                folderDialog.Description = "複写先ファイルフォルダを指定してください";
+                folderDialog.Description = "複写先フォルダを指定してください";
                 folderDialog.ShowNewFolderButton = true;
                 
                 if (folderDialog.ShowDialog() == DialogResult.OK)
