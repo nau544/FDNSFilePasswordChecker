@@ -332,6 +332,7 @@
             this.chkDeleteSourceFiles.TabIndex = 13;
             this.chkDeleteSourceFiles.Text = "複写元フォルダからパスワード付きファイルを削除する";
             this.chkDeleteSourceFiles.UseVisualStyleBackColor = true;
+            this.chkDeleteSourceFiles.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             // 
             // chkNoOutput
             // 
@@ -347,6 +348,7 @@
             this.chkNoOutput.TabIndex = 14;
             this.chkNoOutput.Text = "結果を出力しない";
             this.chkNoOutput.UseVisualStyleBackColor = true;
+            this.chkNoOutput.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             // 
             // chkNoComment
             // 
@@ -362,6 +364,7 @@
             this.chkNoComment.TabIndex = 15;
             this.chkNoComment.Text = "コメントを出力しない";
             this.chkNoComment.UseVisualStyleBackColor = true;
+            this.chkNoComment.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             // 
             // chkDoubleQuote
             // 
@@ -377,6 +380,7 @@
             this.chkDoubleQuote.TabIndex = 16;
             this.chkDoubleQuote.Text = "出力結果の文字をダブルクォーテーションで囲む";
             this.chkDoubleQuote.UseVisualStyleBackColor = true;
+            this.chkDoubleQuote.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             // 
             // lblTitle
             // 
