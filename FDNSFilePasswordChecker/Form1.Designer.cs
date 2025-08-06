@@ -159,14 +159,14 @@
             this.lblSourceFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblSourceFolder.AutoSize = true;
-            this.lblSourceFolder.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSourceFolder.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblSourceFolder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.lblSourceFolder.Location = new System.Drawing.Point(27, 100);
             this.lblSourceFolder.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblSourceFolder.Name = "lblSourceFolder";
             this.lblSourceFolder.Size = new System.Drawing.Size(109, 23);
             this.lblSourceFolder.TabIndex = 1;
-            this.lblSourceFolder.Text = "選択フォルダ：";
+            this.lblSourceFolder.Text = "選択フォルダ";
             // 
             // txtSourceFolder
             // 
@@ -200,14 +200,14 @@
             this.lblOutputFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblOutputFolder.AutoSize = true;
-            this.lblOutputFolder.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblOutputFolder.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblOutputFolder.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.lblOutputFolder.Location = new System.Drawing.Point(27, 175);
             this.lblOutputFolder.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblOutputFolder.Name = "lblOutputFolder";
             this.lblOutputFolder.Size = new System.Drawing.Size(187, 23);
             this.lblOutputFolder.TabIndex = 4;
-            this.lblOutputFolder.Text = "ログ出力先1（office）：";
+            this.lblOutputFolder.Text = "ログ出力先1（office）";
             // 
             // txtOutputFolder
             // 
@@ -241,14 +241,14 @@
             this.lblOutputFolder2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblOutputFolder2.AutoSize = true;
-            this.lblOutputFolder2.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblOutputFolder2.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblOutputFolder2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.lblOutputFolder2.Location = new System.Drawing.Point(27, 250);
             this.lblOutputFolder2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblOutputFolder2.Name = "lblOutputFolder2";
             this.lblOutputFolder2.Size = new System.Drawing.Size(176, 23);
             this.lblOutputFolder2.TabIndex = 7;
-            this.lblOutputFolder2.Text = "ログ出力先2（PDF）：";
+            this.lblOutputFolder2.Text = "ログ出力先2（PDF）";
             // 
             // txtOutputFolder2
             // 
@@ -282,14 +282,14 @@
             this.lblCopyDestination.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lblCopyDestination.AutoSize = true;
-            this.lblCopyDestination.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblCopyDestination.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblCopyDestination.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.lblCopyDestination.Location = new System.Drawing.Point(27, 325);
             this.lblCopyDestination.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblCopyDestination.Name = "lblCopyDestination";
             this.lblCopyDestination.Size = new System.Drawing.Size(126, 23);
             this.lblCopyDestination.TabIndex = 10;
-            this.lblCopyDestination.Text = "複写先フォルダ：";
+            this.lblCopyDestination.Text = "複写先フォルダ";
             // 
             // txtCopyDestination
             // 
