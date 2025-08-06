@@ -421,7 +421,7 @@
             this.Controls.Add(this.lblSourceFolder);
             this.Controls.Add(this.btnSubmit);
             this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.MinimumSize = new System.Drawing.Size(794, 638);
+            this.MinimumSize = new System.Drawing.Size(794, 700);
             this.Name = "Form1";
             this.Text = "PasswordChecker";
             this.ResumeLayout(false);
