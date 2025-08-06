@@ -76,66 +76,64 @@ namespace FDNSFilePasswordChecker
                     return;
                 }
 
-                // バッチファイルのパスを設定
-                string batchPath = Path.Combine(Application.StartupPath, "fpc_1_3_0", "00.パスワードファイルチェッカー.bat");
+                // exeファイルのパスを設定
+                string exePath1 = Path.Combine(Application.StartupPath, "fpc_1_3_0", "FPCCmd.exe");
+                string exePath2 = Path.Combine(Application.StartupPath, "fpc_1_3_0", "FPCNOCmd.exe");
                 
-                // バッチファイルの存在確認
-                if (!File.Exists(batchPath))
+                // exeファイルの存在確認
+                if (!File.Exists(exePath1))
                 {
-                    MessageBox.Show($"バッチファイルが見つかりません: {batchPath}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"実行ファイルが見つかりません: {exePath1}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                if (!File.Exists(exePath2))
+                {
+                    MessageBox.Show($"実行ファイルが見つかりません: {exePath2}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
                 // プロセス開始情報を設定
-                ProcessStartInfo startInfo = new ProcessStartInfo();
-                startInfo.FileName = batchPath;  // バッチファイルを直接実行
-                startInfo.WorkingDirectory = Path.Combine(Application.StartupPath, "fpc_1_3_0");  // fpc_1_3_0フォルダを作業ディレクトリに設定
+                ProcessStartInfo startInfo1 = new ProcessStartInfo();
+                startInfo1.FileName = "cmd.exe";
+                startInfo1.WorkingDirectory = Path.Combine(Application.StartupPath, "fpc_1_3_0");  // fpc_1_3_0フォルダを作業ディレクトリに設定
+                startInfo1.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCCmd.exe /l:\"{txtOutputFolder.Text}\\FPCCmd.log\" /c:\"{txtSourceFolder.Text}\" & PAUSE\"";
+                startInfo1.UseShellExecute = true;  // シェル実行を有効化
+                startInfo1.CreateNoWindow = false;  // ウィンドウを表示
                 
-                // 引数を適切にエスケープして設定
-                string arguments = $"\"{txtSourceFolder.Text}\" \"{txtOutputFolder.Text}\"";
+                ProcessStartInfo startInfo2 = new ProcessStartInfo();
+                startInfo2.FileName = "cmd.exe";
+                startInfo2.WorkingDirectory = Path.Combine(Application.StartupPath, "fpc_1_3_0");  // fpc_1_3_0フォルダを作業ディレクトリに設定
+                startInfo2.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCNOCmd.exe -l \"{txtOutputFolder.Text}\\FPCNOCmd.log\" -c \"{txtSourceFolder.Text}\" & PAUSE\"";
+                startInfo2.UseShellExecute = true;  // シェル実行を有効化
+                startInfo2.CreateNoWindow = false;  // ウィンドウを表示
                 
                 // チェックボックスの状態に応じて引数を追加
                 if (chkExcludePasswordFolders.Checked)
                 {
-                    arguments += " --exclude-password";
+                    startInfo1.Arguments += " --exclude-password";
+                    startInfo2.Arguments += " --exclude-password";
                 }
-                
-                startInfo.Arguments = arguments;
-                startInfo.UseShellExecute = false;  // シェル実行を無効化
-                startInfo.RedirectStandardOutput = true;  // 標準出力をリダイレクト
-                startInfo.RedirectStandardError = true;   // 標準エラーをリダイレクト
-                startInfo.CreateNoWindow = false;  // ウィンドウを表示
-                
-                // バッチファイルを実行
-                using (Process process = new Process())
+
+                // 両方のプロセスを同時に開始
+                using (Process process1 = new Process())
+                using (Process process2 = new Process())
                 {
-                    process.StartInfo = startInfo;
-                    process.Start();
+                    process1.StartInfo = startInfo1;
+                    process2.StartInfo = startInfo2;
                     
-                    // プロセスの終了を待機（エラー確認のため）
-                    process.WaitForExit();
+                    // 同時並行で実行
+                    process1.Start();
+                    process2.Start();
                     
-                    // エラー内容を確認
-                    string error = process.StandardError.ReadToEnd();
-                    string output = process.StandardOutput.ReadToEnd();
-                    
-                    if (!string.IsNullOrEmpty(error))
+                    // 成功メッセージを表示
+                    string message = "FPCCmd.exeとFPCNOCmd.exeを新しいウィンドウで開始しました！";
+                    if (chkExcludePasswordFolders.Checked)
                     {
-                        string errorMessage = "実行中にエラーが発生しました:\n\n";
-                        errorMessage += $"バッチファイル:\n{error}";
-                        MessageBox.Show(errorMessage, "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        message += "\n(パスワード付きファイルは除外されています)";
                     }
-                    else
-                    {
-                        // 成功メッセージを表示
-                        string message = "00.パスワードファイルチェッカー.batを開始しました！";
-                        if (chkExcludePasswordFolders.Checked)
-                        {
-                            message += "\n(パスワード付きファイルは除外されています)";
-                        }
-                        
-                        MessageBox.Show(message, "実行", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                    
+                    MessageBox.Show(message, "実行", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
