@@ -72,7 +72,7 @@ namespace FDNSFilePasswordChecker
         /// </summary>
         /// <param name="sender">イベントの送信元オブジェクト</param>
         /// <param name="e">イベント引数</param>
-        private void btnSubmit_Click(object sender, EventArgs e)
+        private async void btnSubmit_Click(object sender, EventArgs e)
         {
             try
             {
@@ -196,7 +196,7 @@ namespace FDNSFilePasswordChecker
                 startInfo1.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCCmd.exe /l:\"{txtOutputFolder.Text}\" /c:\"{txtSourceFolder.Text}\"{options1} & PAUSE\"";
                 startInfo2.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCNOCmd.exe -l \"{txtOutputFolder2.Text}\" -c \"{txtSourceFolder.Text}\"{options2} & PAUSE\"";
 
-                // 両方のプロセスを同時に開始
+                                    // 両方のプロセスを同時に開始
                 using (Process process1 = new Process())
                 using (Process process2 = new Process())
                 {
@@ -207,14 +207,22 @@ namespace FDNSFilePasswordChecker
                     process1.Start();
                     process2.Start();
                     
+                    // プロセスの完了を待つ
+                    process1.WaitForExit();
+                    process2.WaitForExit();
+                    
+                    // PRファイルの自動コピーを実行
+                    await CopyPasswordProtectedFilesAsync();
+                    
                     // 成功メッセージを表示
-                    string message = "FPCCmd.exeとFPCNOCmd.exeを新しいウィンドウで開始しました！";
+                    string message = "FPCCmd.exeとFPCNOCmd.exeの実行が完了しました！";
                     if (chkExcludePasswordFolders.Checked)
                     {
                         message += "\n(複写元フォルダからパスワード付きファイルが削除されます)";
                     }
+                    message += "\nPRファイルの自動コピーも完了しました。";
                     
-                    MessageBox.Show(message, "実行", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(message, "実行完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
@@ -300,6 +308,140 @@ namespace FDNSFilePasswordChecker
                 {
                     txtCopyDestination.Text = folderDialog.SelectedPath;
                 }
+            }
+        }
+
+        /// <summary>
+        /// パスワード保護されたファイル（PR）を複写先フォルダにコピーする
+        /// </summary>
+        private async Task CopyPasswordProtectedFilesAsync()
+        {
+            try
+            {
+                // ログファイルからPRファイルを抽出してコピー
+                if (File.Exists(txtOutputFolder.Text))
+                {
+                    await ProcessLogFileAsync(txtOutputFolder.Text);
+                }
+                
+                if (File.Exists(txtOutputFolder2.Text))
+                {
+                    await ProcessLogFileAsync(txtOutputFolder2.Text);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"PRファイルのコピー中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        /// <summary>
+        /// ログファイルを解析してPRファイルをコピーする
+        /// </summary>
+        /// <param name="logFilePath">ログファイルのパス</param>
+        private async Task ProcessLogFileAsync(string logFilePath)
+        {
+            try
+            {
+                using (StreamReader reader = new StreamReader(logFilePath, Encoding.UTF8))
+                {
+                    string line;
+                    while ((line = await reader.ReadLineAsync()) != null)
+                    {
+                        // CSV形式の行を解析
+                        string[] parts = line.Split(',');
+                        if (parts.Length >= 3)
+                        {
+                            string status = parts[1].Trim();
+                            string filePath = parts[2].Trim();
+                            
+                            // PRステータスのファイルのみ処理
+                            if (status == "PR" && File.Exists(filePath))
+                            {
+                                await CopyFileWithRelativePathAsync(filePath);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // ログファイルが読めない場合は警告のみ表示
+                Console.WriteLine($"ログファイル読み込みエラー: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// ファイルを相対パスを保持して複写先フォルダにコピーする
+        /// </summary>
+        /// <param name="sourceFilePath">コピー元ファイルのフルパス</param>
+        private async Task CopyFileWithRelativePathAsync(string sourceFilePath)
+        {
+            try
+            {
+                // 選択フォルダからの相対パスを取得（.NET Framework互換実装）
+                string relativePath = GetRelativePath(txtSourceFolder.Text, sourceFilePath);
+                
+                // 複写先のフルパスを構築
+                string destinationPath = Path.Combine(txtCopyDestination.Text, relativePath);
+                
+                // ディレクトリが存在しない場合は作成
+                string destinationDir = Path.GetDirectoryName(destinationPath);
+                if (!Directory.Exists(destinationDir))
+                {
+                    Directory.CreateDirectory(destinationDir);
+                }
+                
+                // ファイルをコピー（上書きする）
+                await Task.Run(() => File.Copy(sourceFilePath, destinationPath, true));
+                
+                Console.WriteLine($"コピー完了: {relativePath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ファイルコピーエラー ({sourceFilePath}): {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// .NET Framework互換の相対パス取得メソッド
+        /// </summary>
+        /// <param name="basePath">基準パス</param>
+        /// <param name="fullPath">フルパス</param>
+        /// <returns>相対パス</returns>
+        private string GetRelativePath(string basePath, string fullPath)
+        {
+            try
+            {
+                // パスを正規化
+                string normalizedBasePath = Path.GetFullPath(basePath);
+                string normalizedFullPath = Path.GetFullPath(fullPath);
+                
+                // 基準パスがフルパスに含まれているかチェック
+                if (normalizedFullPath.StartsWith(normalizedBasePath, StringComparison.OrdinalIgnoreCase))
+                {
+                    // 基準パス部分を除去して相対パスを取得
+                    string relativePath = normalizedFullPath.Substring(normalizedBasePath.Length);
+                    
+                    // 先頭のディレクトリセパレータを除去
+                    if (relativePath.StartsWith(Path.DirectorySeparatorChar.ToString()) || 
+                        relativePath.StartsWith(Path.AltDirectorySeparatorChar.ToString()))
+                    {
+                        relativePath = relativePath.Substring(1);
+                    }
+                    
+                    return relativePath;
+                }
+                else
+                {
+                    // 基準パス外のファイルの場合はファイル名のみ返す
+                    return Path.GetFileName(fullPath);
+                }
+            }
+            catch
+            {
+                // エラーの場合はファイル名のみ返す
+                return Path.GetFileName(fullPath);
             }
         }
     }
