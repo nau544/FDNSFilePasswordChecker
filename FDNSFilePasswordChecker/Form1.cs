@@ -164,8 +164,6 @@ namespace FDNSFilePasswordChecker
                 string options1 = "";  // FPCCmd.exe用のオプション
                 string options2 = "";  // FPCNOCmd.exe用のオプション
 
-
-
                 // 結果を出力しないオプション (USE_SM)
                 if (chkNoOutput.Checked)
                 {
