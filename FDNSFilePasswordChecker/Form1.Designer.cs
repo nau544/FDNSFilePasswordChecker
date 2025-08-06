@@ -73,7 +73,7 @@
         private System.Windows.Forms.Button btnBrowseCopyDestination;
 
         /// <summary>
-        /// パスワード付きフォルダを除外するチェックボックス
+        /// 複写元フォルダからパスワード付きファイルを削除するチェックボックス
         /// </summary>
         private System.Windows.Forms.CheckBox chkExcludePasswordFolders;
 
@@ -170,9 +170,9 @@
             this.txtSourceFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtSourceFolder.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtSourceFolder.Location = new System.Drawing.Point(120, 100);
+            this.txtSourceFolder.Location = new System.Drawing.Point(150, 100);
             this.txtSourceFolder.Name = "txtSourceFolder";
-            this.txtSourceFolder.Size = new System.Drawing.Size(580, 25);
+            this.txtSourceFolder.Size = new System.Drawing.Size(550, 25);
             this.txtSourceFolder.TabIndex = 2;
             // 
             // btnBrowseSource
@@ -185,7 +185,7 @@
             this.btnBrowseSource.ForeColor = System.Drawing.Color.White;
             this.btnBrowseSource.Location = new System.Drawing.Point(20, 98);
             this.btnBrowseSource.Name = "btnBrowseSource";
-            this.btnBrowseSource.Size = new System.Drawing.Size(90, 29);
+            this.btnBrowseSource.Size = new System.Drawing.Size(120, 29);
             this.btnBrowseSource.TabIndex = 3;
             this.btnBrowseSource.Text = "参照";
             this.btnBrowseSource.UseVisualStyleBackColor = false;
@@ -209,9 +209,9 @@
             this.txtOutputFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtOutputFolder.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtOutputFolder.Location = new System.Drawing.Point(120, 160);
+            this.txtOutputFolder.Location = new System.Drawing.Point(150, 160);
             this.txtOutputFolder.Name = "txtOutputFolder";
-            this.txtOutputFolder.Size = new System.Drawing.Size(580, 25);
+            this.txtOutputFolder.Size = new System.Drawing.Size(550, 25);
             this.txtOutputFolder.TabIndex = 5;
             // 
             // btnBrowseOutput
@@ -224,9 +224,9 @@
             this.btnBrowseOutput.ForeColor = System.Drawing.Color.White;
             this.btnBrowseOutput.Location = new System.Drawing.Point(20, 158);
             this.btnBrowseOutput.Name = "btnBrowseOutput";
-            this.btnBrowseOutput.Size = new System.Drawing.Size(90, 29);
+            this.btnBrowseOutput.Size = new System.Drawing.Size(120, 29);
             this.btnBrowseOutput.TabIndex = 6;
-            this.btnBrowseOutput.Text = "参照";
+            this.btnBrowseOutput.Text = "ファイル指定";
             this.btnBrowseOutput.UseVisualStyleBackColor = false;
             this.btnBrowseOutput.Click += new System.EventHandler(this.btnBrowseOutput_Click);
             // 
@@ -248,9 +248,9 @@
             this.txtOutputFolder2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtOutputFolder2.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtOutputFolder2.Location = new System.Drawing.Point(120, 220);
+            this.txtOutputFolder2.Location = new System.Drawing.Point(150, 220);
             this.txtOutputFolder2.Name = "txtOutputFolder2";
-            this.txtOutputFolder2.Size = new System.Drawing.Size(580, 25);
+            this.txtOutputFolder2.Size = new System.Drawing.Size(550, 25);
             this.txtOutputFolder2.TabIndex = 8;
             // 
             // btnBrowseOutput2
@@ -263,9 +263,9 @@
             this.btnBrowseOutput2.ForeColor = System.Drawing.Color.White;
             this.btnBrowseOutput2.Location = new System.Drawing.Point(20, 218);
             this.btnBrowseOutput2.Name = "btnBrowseOutput2";
-            this.btnBrowseOutput2.Size = new System.Drawing.Size(90, 29);
+            this.btnBrowseOutput2.Size = new System.Drawing.Size(120, 29);
             this.btnBrowseOutput2.TabIndex = 9;
-            this.btnBrowseOutput2.Text = "参照";
+            this.btnBrowseOutput2.Text = "ファイル指定";
             this.btnBrowseOutput2.UseVisualStyleBackColor = false;
             this.btnBrowseOutput2.Click += new System.EventHandler(this.btnBrowseOutput2_Click);
             // 
@@ -287,9 +287,9 @@
             this.txtCopyDestination.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtCopyDestination.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtCopyDestination.Location = new System.Drawing.Point(120, 280);
+            this.txtCopyDestination.Location = new System.Drawing.Point(150, 280);
             this.txtCopyDestination.Name = "txtCopyDestination";
-            this.txtCopyDestination.Size = new System.Drawing.Size(580, 25);
+            this.txtCopyDestination.Size = new System.Drawing.Size(550, 25);
             this.txtCopyDestination.TabIndex = 11;
             // 
             // btnBrowseCopyDestination
@@ -302,7 +302,7 @@
             this.btnBrowseCopyDestination.ForeColor = System.Drawing.Color.White;
             this.btnBrowseCopyDestination.Location = new System.Drawing.Point(20, 278);
             this.btnBrowseCopyDestination.Name = "btnBrowseCopyDestination";
-            this.btnBrowseCopyDestination.Size = new System.Drawing.Size(90, 29);
+            this.btnBrowseCopyDestination.Size = new System.Drawing.Size(120, 29);
             this.btnBrowseCopyDestination.TabIndex = 12;
             this.btnBrowseCopyDestination.Text = "参照";
             this.btnBrowseCopyDestination.UseVisualStyleBackColor = false;
@@ -317,9 +317,9 @@
             this.chkExcludePasswordFolders.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.chkExcludePasswordFolders.Location = new System.Drawing.Point(20, 320);
             this.chkExcludePasswordFolders.Name = "chkExcludePasswordFolders";
-            this.chkExcludePasswordFolders.Size = new System.Drawing.Size(180, 16);
+            this.chkExcludePasswordFolders.Size = new System.Drawing.Size(320, 16);
             this.chkExcludePasswordFolders.TabIndex = 13;
-            this.chkExcludePasswordFolders.Text = "パスワード付きフォルダを除外する";
+            this.chkExcludePasswordFolders.Text = "複写元フォルダからパスワード付きファイルを削除する";
             this.chkExcludePasswordFolders.UseVisualStyleBackColor = true;
             // 
             // chkNoOutput

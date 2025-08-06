@@ -211,7 +211,7 @@ namespace FDNSFilePasswordChecker
                     string message = "FPCCmd.exeとFPCNOCmd.exeを新しいウィンドウで開始しました！";
                     if (chkExcludePasswordFolders.Checked)
                     {
-                        message += "\n(パスワード付きファイルは除外されています)";
+                        message += "\n(複写元フォルダからパスワード付きファイルが削除されます)";
                     }
                     
                     MessageBox.Show(message, "実行", MessageBoxButtons.OK, MessageBoxIcon.Information);
