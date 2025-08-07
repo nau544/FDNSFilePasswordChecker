@@ -209,12 +209,16 @@ namespace FDNSFilePasswordChecker
                     
                     // 成功メッセージを表示
                     string message = "FPCCmd.exeとFPCNOCmd.exeの実行が完了しました！";
-                    message += "\nPRファイルの自動コピーも完了しました。";
+                    message += "\nPRファイルの自動処理も完了しました。";
                     
-                    // 削除機能が有効な場合のメッセージを追加
+                    // 処理内容に応じたメッセージを追加
                     if (chkDeleteSourceFiles.Checked)
                     {
-                        message += "\n複写元フォルダからのPRファイル削除も完了しました。";
+                        message += "\n移動元フォルダへのコピーも完了しました。";
+                    }
+                    else
+                    {
+                        message += "\n移動元フォルダからのファイル移動も完了しました。";
                     }
                     
                     MessageBox.Show(message, "実行完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -296,7 +300,7 @@ namespace FDNSFilePasswordChecker
         {
             using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
             {
-                folderDialog.Description = "複写先フォルダを指定してください";
+                folderDialog.Description = "パスワード付きファイルの移動先フォルダを指定してください";
                 folderDialog.ShowNewFolderButton = true;
                 
                 if (folderDialog.ShowDialog() == DialogResult.OK)
@@ -313,38 +317,44 @@ namespace FDNSFilePasswordChecker
         {
             try
             {
-                // 削除対象のファイルリストを保持
-                List<string> filesToDelete = new List<string>();
+                // 処理対象のファイルリストを保持
+                List<string> filesToProcess = new List<string>();
                 
-                // ログファイルからPRファイルを抽出してコピー
+                // ログファイルからPRファイルを抽出して処理
                 if (File.Exists(txtOutputFolder.Text))
                 {
-                    await ProcessLogFileAsync(txtOutputFolder.Text, filesToDelete);
+                    await ProcessLogFileAsync(txtOutputFolder.Text, filesToProcess);
                 }
                 
                 if (File.Exists(txtOutputFolder2.Text))
                 {
-                    await ProcessLogFileAsync(txtOutputFolder2.Text, filesToDelete);
+                    await ProcessLogFileAsync(txtOutputFolder2.Text, filesToProcess);
                 }
                 
-                // チェックボックスがチェックされている場合、複写元フォルダからPRファイルを削除
-                if (chkDeleteSourceFiles.Checked && filesToDelete.Count > 0)
+                // チェックボックスがチェックされている場合はコピー、そうでなければ移動（削除）
+                if (chkDeleteSourceFiles.Checked && filesToProcess.Count > 0)
                 {
-                    await DeleteSourceFilesAsync(filesToDelete);
+                    // コピー処理（元ファイルは残す）
+                    await CopySourceFilesAsync(filesToProcess);
+                }
+                else if (filesToProcess.Count > 0)
+                {
+                    // 移動処理（元ファイルを削除）
+                    await DeleteSourceFilesAsync(filesToProcess);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"PRファイルのコピー中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show($"PRファイルの処理中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
         /// <summary>
-        /// ログファイルを解析してPRファイルをコピーする
+        /// ログファイルを解析してPRファイルを処理する
         /// </summary>
         /// <param name="logFilePath">ログファイルのパス</param>
-        /// <param name="filesToDelete">削除対象のファイルリスト（出力パラメータ）</param>
-        private async Task ProcessLogFileAsync(string logFilePath, List<string> filesToDelete)
+        /// <param name="filesToProcess">処理対象のファイルリスト（出力パラメータ）</param>
+        private async Task ProcessLogFileAsync(string logFilePath, List<string> filesToProcess)
         {
             try
             {
@@ -364,7 +374,7 @@ namespace FDNSFilePasswordChecker
                             if (status == "PR" && File.Exists(filePath))
                             {
                                 await CopyFileWithRelativePathAsync(filePath);
-                                filesToDelete.Add(filePath); // コピーしたファイルを削除リストに追加
+                                filesToProcess.Add(filePath); // 処理したファイルをリストに追加
                             }
                         }
                     }
@@ -378,7 +388,7 @@ namespace FDNSFilePasswordChecker
         }
 
         /// <summary>
-        /// ファイルを相対パスを保持して複写先フォルダにコピーする
+        /// ファイルを相対パスを保持して移動先フォルダにコピーする
         /// </summary>
         /// <param name="sourceFilePath">コピー元ファイルのフルパス</param>
         private async Task CopyFileWithRelativePathAsync(string sourceFilePath)
@@ -388,7 +398,7 @@ namespace FDNSFilePasswordChecker
                 // 選択フォルダからの相対パスを取得（.NET Framework互換実装）
                 string relativePath = GetRelativePath(txtSourceFolder.Text, sourceFilePath);
                 
-                // 複写先のフルパスを構築
+                // 移動先のフルパスを構築
                 string destinationPath = Path.Combine(txtCopyDestination.Text, relativePath);
                 
                 // ディレクトリが存在しない場合は作成
@@ -406,6 +416,36 @@ namespace FDNSFilePasswordChecker
             catch (Exception ex)
             {
                 Console.WriteLine($"ファイルコピーエラー ({sourceFilePath}): {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 移動元フォルダに指定されたファイルをコピーする
+        /// </summary>
+        /// <param name="filesToCopy">コピー対象のファイルパスリスト</param>
+        private async Task CopySourceFilesAsync(List<string> filesToCopy)
+        {
+            try
+            {
+                foreach (string filePath in filesToCopy)
+                {
+                    string relativePath = GetRelativePath(txtSourceFolder.Text, filePath);
+                    string fullPathToCopy = Path.Combine(txtSourceFolder.Text, relativePath);
+
+                    if (File.Exists(fullPathToCopy))
+                    {
+                        // 移動先フォルダにコピー（既にCopyFileWithRelativePathAsyncで実行済み）
+                        Console.WriteLine($"コピー完了（元ファイル保持）: {relativePath}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"コピー対象ファイルが見つかりません: {relativePath}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"移動元フォルダへのファイルコピー中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

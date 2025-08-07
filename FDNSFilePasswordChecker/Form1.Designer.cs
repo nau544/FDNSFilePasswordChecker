@@ -289,7 +289,7 @@
             this.lblCopyDestination.Name = "lblCopyDestination";
             this.lblCopyDestination.Size = new System.Drawing.Size(126, 23);
             this.lblCopyDestination.TabIndex = 10;
-            this.lblCopyDestination.Text = "複写先フォルダ";
+            this.lblCopyDestination.Text = "パスワード付きファイルの移動先フォルダ";
             // 
             // txtCopyDestination
             // 
@@ -330,7 +330,7 @@
             this.chkDeleteSourceFiles.Name = "chkDeleteSourceFiles";
             this.chkDeleteSourceFiles.Size = new System.Drawing.Size(374, 27);
             this.chkDeleteSourceFiles.TabIndex = 13;
-            this.chkDeleteSourceFiles.Text = "複写元フォルダからパスワード付きファイルを削除する";
+            this.chkDeleteSourceFiles.Text = "移動元フォルダにコピーする";
             this.chkDeleteSourceFiles.UseVisualStyleBackColor = true;
             this.chkDeleteSourceFiles.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             // 
