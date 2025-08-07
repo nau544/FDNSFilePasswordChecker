@@ -330,7 +330,7 @@
             this.chkDeleteSourceFiles.Name = "chkDeleteSourceFiles";
             this.chkDeleteSourceFiles.Size = new System.Drawing.Size(374, 27);
             this.chkDeleteSourceFiles.TabIndex = 13;
-            this.chkDeleteSourceFiles.Text = "移動元フォルダにコピーする";
+            this.chkDeleteSourceFiles.Text = "選択フォルダにファイルを残す";
             this.chkDeleteSourceFiles.UseVisualStyleBackColor = true;
             this.chkDeleteSourceFiles.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             // 
