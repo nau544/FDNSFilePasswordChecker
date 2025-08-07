@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
+using System.Configuration;
+using System.Text.RegularExpressions;
 
 namespace FDNSFilePasswordChecker
 {
@@ -17,10 +19,16 @@ namespace FDNSFilePasswordChecker
         public Form1()
         {
             InitializeComponent();
+            InitializeForm();
+        }
+
+        /// <summary>
+        /// フォームの初期化を行う
+        /// </summary>
+        private void InitializeForm()
+        {
             this.Resize += Form1_Resize;
             CenterSubmitButton();
-            
-            // ボタンのマウスイベントハンドラーを設定（ホバー時にカーソルをポインターに変更）
             SetupButtonHoverEffects();
         }
 
@@ -39,7 +47,6 @@ namespace FDNSFilePasswordChecker
         /// </summary>
         private void CenterSubmitButton()
         {
-            // 実行ボタンを水平方向の中央に配置
             int centerX = (this.ClientSize.Width - btnSubmit.Width) / 2;
             btnSubmit.Location = new Point(centerX, btnSubmit.Location.Y);
         }
@@ -49,22 +56,21 @@ namespace FDNSFilePasswordChecker
         /// </summary>
         private void SetupButtonHoverEffects()
         {
-            // 実行ボタンのホバー効果
-            btnSubmit.MouseEnter += (sender, e) => { btnSubmit.Cursor = Cursors.Hand; };
-            btnSubmit.MouseLeave += (sender, e) => { btnSubmit.Cursor = Cursors.Default; };
+            SetupButtonHoverEffect(btnSubmit);
+            SetupButtonHoverEffect(btnBrowseSource);
+            SetupButtonHoverEffect(btnBrowseOutput);
+            SetupButtonHoverEffect(btnBrowseOutput2);
+            SetupButtonHoverEffect(btnBrowseCopyDestination);
+        }
 
-            // 参照ボタンのホバー効果
-            btnBrowseSource.MouseEnter += (sender, e) => { btnBrowseSource.Cursor = Cursors.Hand; };
-            btnBrowseSource.MouseLeave += (sender, e) => { btnBrowseSource.Cursor = Cursors.Default; };
-
-            btnBrowseOutput.MouseEnter += (sender, e) => { btnBrowseOutput.Cursor = Cursors.Hand; };
-            btnBrowseOutput.MouseLeave += (sender, e) => { btnBrowseOutput.Cursor = Cursors.Default; };
-
-            btnBrowseOutput2.MouseEnter += (sender, e) => { btnBrowseOutput2.Cursor = Cursors.Hand; };
-            btnBrowseOutput2.MouseLeave += (sender, e) => { btnBrowseOutput2.Cursor = Cursors.Default; };
-
-            btnBrowseCopyDestination.MouseEnter += (sender, e) => { btnBrowseCopyDestination.Cursor = Cursors.Hand; };
-            btnBrowseCopyDestination.MouseLeave += (sender, e) => { btnBrowseCopyDestination.Cursor = Cursors.Default; };
+        /// <summary>
+        /// 個別のボタンにホバー効果を設定する
+        /// </summary>
+        /// <param name="button">設定対象のボタン</param>
+        private void SetupButtonHoverEffect(Button button)
+        {
+            button.MouseEnter += (sender, e) => { button.Cursor = Cursors.Hand; };
+            button.MouseLeave += (sender, e) => { button.Cursor = Cursors.Default; };
         }
 
         /// <summary>
@@ -76,158 +82,126 @@ namespace FDNSFilePasswordChecker
         {
             try
             {
-                // 入力値の検証
-                if (string.IsNullOrWhiteSpace(txtSourceFolder.Text))
-                {
-                    MessageBox.Show("選択フォルダを指定してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(txtOutputFolder.Text))
-                {
-                    MessageBox.Show("ログ出力先1（office）を指定してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(txtOutputFolder2.Text))
-                {
-                    MessageBox.Show("ログ出力先2（PDF）を指定してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(txtCopyDestination.Text))
-                {
-                    MessageBox.Show("複写先フォルダを指定してください。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // フォルダの存在確認
-                if (!Directory.Exists(txtSourceFolder.Text))
-                {
-                    MessageBox.Show("指定された選択フォルダが存在しません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // ログ出力先1はファイルパスなので、親ディレクトリの存在確認を行う
-                string outputDir1 = Path.GetDirectoryName(txtOutputFolder.Text);
-                if (!Directory.Exists(outputDir1))
-                {
-                    MessageBox.Show("指定されたログ出力先1（office）の保存先フォルダが存在しません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // ログ出力先2はファイルパスなので、親ディレクトリの存在確認を行う
-                string outputDir2 = Path.GetDirectoryName(txtOutputFolder2.Text);
-                if (!Directory.Exists(outputDir2))
-                {
-                    MessageBox.Show("指定されたログ出力先2（PDF）の保存先フォルダが存在しません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                if (!Directory.Exists(txtCopyDestination.Text))
-                {
-                    MessageBox.Show("指定された複写先フォルダが存在しません。", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
-
-                // exeファイルのパスを設定
-                string exePath1 = Path.Combine(Application.StartupPath, "fpc_1_3_0", "FPCCmd.exe");
-                string exePath2 = Path.Combine(Application.StartupPath, "fpc_1_3_0", "FPCNOCmd.exe");
+                // ログファイルの設定
+                Logger.SetLogFilePath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "FDNSFilePasswordChecker.log"));
+                Logger.LogInfo("アプリケーション実行を開始します");
                 
-                // exeファイルの存在確認
-                if (!File.Exists(exePath1))
+                if (!ValidateInputs())
                 {
-                    MessageBox.Show($"実行ファイルが見つかりません: {exePath1}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Logger.LogWarning("入力値の検証でエラーが発生しました");
                     return;
                 }
 
-                if (!File.Exists(exePath2))
+                if (!await ExecuteProcesses())
                 {
-                    MessageBox.Show($"実行ファイルが見つかりません: {exePath2}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Logger.LogError("プロセス実行でエラーが発生しました");
                     return;
                 }
 
-                // プロセス開始情報を設定
-                ProcessStartInfo startInfo1 = new ProcessStartInfo();
-                startInfo1.FileName = "cmd.exe";
-                startInfo1.WorkingDirectory = Path.Combine(Application.StartupPath, "fpc_1_3_0");  // fpc_1_3_0フォルダを作業ディレクトリに設定
-                startInfo1.UseShellExecute = true;  // シェル実行を有効化
-                startInfo1.CreateNoWindow = false;  // ウィンドウを表示
+                await ProcessFiles();
+                ShowSuccessMessage();
                 
-                ProcessStartInfo startInfo2 = new ProcessStartInfo();
-                startInfo2.FileName = "cmd.exe";
-                startInfo2.WorkingDirectory = Path.Combine(Application.StartupPath, "fpc_1_3_0");  // fpc_1_3_0フォルダを作業ディレクトリに設定
-                startInfo2.UseShellExecute = true;  // シェル実行を有効化
-                startInfo2.CreateNoWindow = false;  // ウィンドウを表示
-                
-                // チェックボックスの状態に応じて引数を追加
-                string options1 = "";  // FPCCmd.exe用のオプション
-                string options2 = "";  // FPCNOCmd.exe用のオプション
-
-                // 結果を出力しないオプション (USE_SM)
-                if (chkNoOutput.Checked)
-                {
-                    options1 += " /sm";
-                    options2 += " --sm";
-                }
-
-                // コメントを出力しないオプション (USE_NC)
-                if (chkNoComment.Checked)
-                {
-                    options1 += " /nc";
-                    options2 += " --nc";
-                }
-
-                // 出力結果の文字をダブルクォーテーションで囲むオプション (USE_DQ)
-                if (chkDoubleQuote.Checked)
-                {
-                    options1 += " /dq";
-                    options2 += " --dq";
-                }
-
-                // オプションを引数に追加
-                startInfo1.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCCmd.exe /l:\"{txtOutputFolder.Text}\" /c:\"{txtSourceFolder.Text}\"{options1} & PAUSE\"";
-                startInfo2.Arguments = $"/c \"cd /d {Path.Combine(Application.StartupPath, "fpc_1_3_0")} && FPCNOCmd.exe -l \"{txtOutputFolder2.Text}\" -c \"{txtSourceFolder.Text}\"{options2} & PAUSE\"";
-
-                                    // 両方のプロセスを同時に開始
-                using (Process process1 = new Process())
-                using (Process process2 = new Process())
-                {
-                    process1.StartInfo = startInfo1;
-                    process2.StartInfo = startInfo2;
-                    
-                    // 同時並行で実行
-                    process1.Start();
-                    process2.Start();
-                    
-                    // プロセスの完了を待つ
-                    process1.WaitForExit();
-                    process2.WaitForExit();
-                    
-                    // PRファイルの自動コピーを実行
-                    await CopyPasswordProtectedFilesAsync();
-                    
-                    // 成功メッセージを表示
-                    string message = "FPCCmd.exeとFPCNOCmd.exeの実行が完了しました！";
-                    message += "\nPRファイルの自動処理も完了しました。";
-                    
-                    // 処理内容に応じたメッセージを追加
-                    if (chkDeleteSourceFiles.Checked)
-                    {
-                        message += "\n移動元フォルダへのコピーも完了しました。";
-                    }
-                    else
-                    {
-                        message += "\n移動元フォルダからのファイル移動も完了しました。";
-                    }
-                    
-                    MessageBox.Show(message, "実行完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                Logger.LogInfo("アプリケーション実行が正常に完了しました");
             }
             catch (Exception ex)
             {
+                Logger.LogError($"実行中にエラーが発生しました: {ex.Message}");
                 MessageBox.Show($"実行中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        /// <summary>
+        /// プロセスを実行する
+        /// </summary>
+        /// <returns>成功した場合はtrue</returns>
+        private async Task<bool> ExecuteProcesses()
+        {
+            string workingDirectory = AppConfigurationManager.GetWorkingDirectory();
+            var processExecutor = new ProcessExecutor(workingDirectory);
+            
+            if (!processExecutor.ValidateConfiguration())
+            {
+                return false;
+            }
+
+            var (options1, options2) = processExecutor.BuildOptions(
+                chkNoOutput.Checked, 
+                chkNoComment.Checked, 
+                chkDoubleQuote.Checked
+            );
+
+            await processExecutor.ExecuteProcessesAsync(
+                txtSourceFolder.Text,
+                txtOutputFolder.Text,
+                txtOutputFolder2.Text,
+                options1,
+                options2
+            );
+
+            return true;
+        }
+
+        /// <summary>
+        /// ファイル処理を実行する
+        /// </summary>
+        private async Task ProcessFiles()
+        {
+            var fileProcessor = new FileProcessor(txtSourceFolder.Text, txtCopyDestination.Text);
+            var logFiles = new List<string> { txtOutputFolder.Text, txtOutputFolder2.Text };
+            await fileProcessor.ProcessPasswordProtectedFilesAsync(logFiles, chkDeleteSourceFiles.Checked);
+        }
+
+        /// <summary>
+        /// 設定確認ボタンのクリックイベントハンドラー
+        /// </summary>
+        /// <param name="sender">イベントの送信元オブジェクト</param>
+        /// <param name="e">イベント引数</param>
+        private void btnCheckConfig_Click(object sender, EventArgs e)
+        {
+            string workingDirectory = AppConfigurationManager.GetWorkingDirectory();
+            var processExecutor = new ProcessExecutor(workingDirectory);
+            
+            if (processExecutor.ValidateConfiguration())
+            {
+                MessageBox.Show("設定は正常です。\n\n必要なファイルがすべて配置されています。\n\nデフォルト動作：選択フォルダからファイルを移動\nチェック時：選択フォルダにコピー", "設定確認", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        /// <summary>
+        /// 入力値の検証を行う
+        /// </summary>
+        /// <returns>検証が成功した場合はtrue</returns>
+        private bool ValidateInputs()
+        {
+            return InputValidator.ValidateAllInputs(
+                txtSourceFolder.Text,
+                txtOutputFolder.Text,
+                txtOutputFolder2.Text,
+                txtCopyDestination.Text
+            );
+        }
+
+
+
+        /// <summary>
+        /// 成功メッセージを表示する
+        /// </summary>
+        private void ShowSuccessMessage()
+        {
+            var message = new StringBuilder();
+            message.AppendLine("FPCCmd.exeとFPCNOCmd.exeの実行が完了しました！");
+            message.AppendLine("PRファイルの自動処理も完了しました。");
+            
+            if (chkDeleteSourceFiles.Checked)
+            {
+                message.AppendLine("選択フォルダへのコピーも完了しました。");
+            }
+            else
+            {
+                message.AppendLine("選択フォルダからのファイル移動も完了しました。");
+            }
+            
+            MessageBox.Show(message.ToString(), "実行完了", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
@@ -237,16 +211,7 @@ namespace FDNSFilePasswordChecker
         /// <param name="e">イベント引数</param>
         private void btnBrowseSource_Click(object sender, EventArgs e)
         {
-            using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
-            {
-                folderDialog.Description = "選択フォルダを指定してください";
-                folderDialog.ShowNewFolderButton = false;
-                
-                if (folderDialog.ShowDialog() == DialogResult.OK)
-                {
-                    txtSourceFolder.Text = folderDialog.SelectedPath;
-                }
-            }
+            ShowFolderBrowserDialog("選択フォルダを指定してください", txtSourceFolder, false);
         }
 
         /// <summary>
@@ -256,18 +221,7 @@ namespace FDNSFilePasswordChecker
         /// <param name="e">イベント引数</param>
         private void btnBrowseOutput_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog saveDialog = new SaveFileDialog())
-            {
-                saveDialog.Title = "ログ出力先ファイルを指定してください";
-                saveDialog.Filter = "ログファイル (*.log)|*.log|テキストファイル (*.txt)|*.txt|すべてのファイル (*.*)|*.*";
-                saveDialog.DefaultExt = "log";
-                saveDialog.FileName = "FPCCmd.log";
-                
-                if (saveDialog.ShowDialog() == DialogResult.OK)
-                {
-                    txtOutputFolder.Text = saveDialog.FileName;
-                }
-            }
+            ShowSaveFileDialog("ログ出力先ファイルを指定してください", "FPCCmd.log", txtOutputFolder);
         }
 
         /// <summary>
@@ -277,18 +231,7 @@ namespace FDNSFilePasswordChecker
         /// <param name="e">イベント引数</param>
         private void btnBrowseOutput2_Click(object sender, EventArgs e)
         {
-            using (SaveFileDialog saveDialog = new SaveFileDialog())
-            {
-                saveDialog.Title = "ログ出力先2（PDF）ファイルを指定してください";
-                saveDialog.Filter = "ログファイル (*.log)|*.log|テキストファイル (*.txt)|*.txt|すべてのファイル (*.*)|*.*";
-                saveDialog.DefaultExt = "log";
-                saveDialog.FileName = "FPCNOCmd.log";
-                
-                if (saveDialog.ShowDialog() == DialogResult.OK)
-                {
-                    txtOutputFolder2.Text = saveDialog.FileName;
-                }
-            }
+            ShowSaveFileDialog("ログ出力先2（PDF）ファイルを指定してください", "FPCNOCmd.log", txtOutputFolder2);
         }
 
         /// <summary>
@@ -298,226 +241,48 @@ namespace FDNSFilePasswordChecker
         /// <param name="e">イベント引数</param>
         private void btnBrowseCopyDestination_Click(object sender, EventArgs e)
         {
-            using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
+            ShowFolderBrowserDialog("パスワード付きファイルの移動先フォルダを指定してください", txtCopyDestination, true);
+        }
+
+        /// <summary>
+        /// フォルダブラウザダイアログを表示する
+        /// </summary>
+        /// <param name="description">説明</param>
+        /// <param name="textBox">結果を設定するテキストボックス</param>
+        /// <param name="showNewFolderButton">新規フォルダボタンを表示するかどうか</param>
+        private void ShowFolderBrowserDialog(string description, TextBox textBox, bool showNewFolderButton)
+        {
+            using (var folderDialog = new FolderBrowserDialog())
             {
-                folderDialog.Description = "パスワード付きファイルの移動先フォルダを指定してください";
-                folderDialog.ShowNewFolderButton = true;
+                folderDialog.Description = description;
+                folderDialog.ShowNewFolderButton = showNewFolderButton;
                 
                 if (folderDialog.ShowDialog() == DialogResult.OK)
                 {
-                    txtCopyDestination.Text = folderDialog.SelectedPath;
+                    textBox.Text = folderDialog.SelectedPath;
                 }
             }
         }
 
         /// <summary>
-        /// パスワード保護されたファイル（PR）を複写先フォルダにコピーする
+        /// ファイル保存ダイアログを表示する
         /// </summary>
-        private async Task CopyPasswordProtectedFilesAsync()
+        /// <param name="title">タイトル</param>
+        /// <param name="defaultFileName">デフォルトファイル名</param>
+        /// <param name="textBox">結果を設定するテキストボックス</param>
+        private void ShowSaveFileDialog(string title, string defaultFileName, TextBox textBox)
         {
-            try
+            using (var saveDialog = new SaveFileDialog())
             {
-                // 処理対象のファイルリストを保持
-                List<string> filesToProcess = new List<string>();
+                saveDialog.Title = title;
+                saveDialog.Filter = "ログファイル (*.log)|*.log|テキストファイル (*.txt)|*.txt|すべてのファイル (*.*)|*.*";
+                saveDialog.DefaultExt = "log";
+                saveDialog.FileName = defaultFileName;
                 
-                // ログファイルからPRファイルを抽出して処理
-                if (File.Exists(txtOutputFolder.Text))
+                if (saveDialog.ShowDialog() == DialogResult.OK)
                 {
-                    await ProcessLogFileAsync(txtOutputFolder.Text, filesToProcess);
+                    textBox.Text = saveDialog.FileName;
                 }
-                
-                if (File.Exists(txtOutputFolder2.Text))
-                {
-                    await ProcessLogFileAsync(txtOutputFolder2.Text, filesToProcess);
-                }
-                
-                // チェックボックスがチェックされている場合はコピー、そうでなければ移動（削除）
-                if (chkDeleteSourceFiles.Checked && filesToProcess.Count > 0)
-                {
-                    // コピー処理（元ファイルは残す）
-                    await CopySourceFilesAsync(filesToProcess);
-                }
-                else if (filesToProcess.Count > 0)
-                {
-                    // 移動処理（元ファイルを削除）
-                    await DeleteSourceFilesAsync(filesToProcess);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"PRファイルの処理中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
-        /// <summary>
-        /// ログファイルを解析してPRファイルを処理する
-        /// </summary>
-        /// <param name="logFilePath">ログファイルのパス</param>
-        /// <param name="filesToProcess">処理対象のファイルリスト（出力パラメータ）</param>
-        private async Task ProcessLogFileAsync(string logFilePath, List<string> filesToProcess)
-        {
-            try
-            {
-                using (StreamReader reader = new StreamReader(logFilePath, Encoding.UTF8))
-                {
-                    string line;
-                    while ((line = await reader.ReadLineAsync()) != null)
-                    {
-                        // CSV形式の行を解析
-                        string[] parts = line.Split(',');
-                        if (parts.Length >= 3)
-                        {
-                            string status = parts[1].Trim();
-                            string filePath = parts[2].Trim();
-                            
-                            // PRステータスのファイルのみ処理
-                            if (status == "PR" && File.Exists(filePath))
-                            {
-                                await CopyFileWithRelativePathAsync(filePath);
-                                filesToProcess.Add(filePath); // 処理したファイルをリストに追加
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // ログファイルが読めない場合は警告のみ表示
-                Console.WriteLine($"ログファイル読み込みエラー: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// ファイルを相対パスを保持して移動先フォルダにコピーする
-        /// </summary>
-        /// <param name="sourceFilePath">コピー元ファイルのフルパス</param>
-        private async Task CopyFileWithRelativePathAsync(string sourceFilePath)
-        {
-            try
-            {
-                // 選択フォルダからの相対パスを取得（.NET Framework互換実装）
-                string relativePath = GetRelativePath(txtSourceFolder.Text, sourceFilePath);
-                
-                // 移動先のフルパスを構築
-                string destinationPath = Path.Combine(txtCopyDestination.Text, relativePath);
-                
-                // ディレクトリが存在しない場合は作成
-                string destinationDir = Path.GetDirectoryName(destinationPath);
-                if (!Directory.Exists(destinationDir))
-                {
-                    Directory.CreateDirectory(destinationDir);
-                }
-                
-                // ファイルをコピー（上書きする）
-                await Task.Run(() => File.Copy(sourceFilePath, destinationPath, true));
-                
-                Console.WriteLine($"コピー完了: {relativePath}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"ファイルコピーエラー ({sourceFilePath}): {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// 移動元フォルダに指定されたファイルをコピーする
-        /// </summary>
-        /// <param name="filesToCopy">コピー対象のファイルパスリスト</param>
-        private async Task CopySourceFilesAsync(List<string> filesToCopy)
-        {
-            try
-            {
-                foreach (string filePath in filesToCopy)
-                {
-                    string relativePath = GetRelativePath(txtSourceFolder.Text, filePath);
-                    string fullPathToCopy = Path.Combine(txtSourceFolder.Text, relativePath);
-
-                    if (File.Exists(fullPathToCopy))
-                    {
-                        // 移動先フォルダにコピー（既にCopyFileWithRelativePathAsyncで実行済み）
-                        Console.WriteLine($"コピー完了（元ファイル保持）: {relativePath}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"コピー対象ファイルが見つかりません: {relativePath}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"移動元フォルダへのファイルコピー中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
-        /// <summary>
-        /// 複写元フォルダから指定されたファイルを削除する
-        /// </summary>
-        /// <param name="filesToDelete">削除対象のファイルパスリスト</param>
-        private async Task DeleteSourceFilesAsync(List<string> filesToDelete)
-        {
-            try
-            {
-                foreach (string filePath in filesToDelete)
-                {
-                    string relativePath = GetRelativePath(txtSourceFolder.Text, filePath);
-                    string fullPathToDelete = Path.Combine(txtSourceFolder.Text, relativePath);
-
-                    if (File.Exists(fullPathToDelete))
-                    {
-                        await Task.Run(() => File.Delete(fullPathToDelete));
-                        Console.WriteLine($"削除完了: {relativePath}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"削除対象ファイルが見つかりません: {relativePath}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"複写元フォルダからのファイル削除中にエラーが発生しました: {ex.Message}", "エラー", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
-        /// <summary>
-        /// .NET Framework互換の相対パス取得メソッド
-        /// </summary>
-        /// <param name="basePath">基準パス</param>
-        /// <param name="fullPath">フルパス</param>
-        /// <returns>相対パス</returns>
-        private string GetRelativePath(string basePath, string fullPath)
-        {
-            try
-            {
-                // パスを正規化
-                string normalizedBasePath = Path.GetFullPath(basePath);
-                string normalizedFullPath = Path.GetFullPath(fullPath);
-                
-                // 基準パスがフルパスに含まれているかチェック
-                if (normalizedFullPath.StartsWith(normalizedBasePath, StringComparison.OrdinalIgnoreCase))
-                {
-                    // 基準パス部分を除去して相対パスを取得
-                    string relativePath = normalizedFullPath.Substring(normalizedBasePath.Length);
-                    
-                    // 先頭のディレクトリセパレータを除去
-                    if (relativePath.StartsWith(Path.DirectorySeparatorChar.ToString()) || 
-                        relativePath.StartsWith(Path.AltDirectorySeparatorChar.ToString()))
-                    {
-                        relativePath = relativePath.Substring(1);
-                    }
-                    
-                    return relativePath;
-                }
-                else
-                {
-                    // 基準パス外のファイルの場合はファイル名のみ返す
-                    return Path.GetFileName(fullPath);
-                }
-            }
-            catch
-            {
-                // エラーの場合はファイル名のみ返す
-                return Path.GetFileName(fullPath);
             }
         }
     }
