@@ -151,22 +151,7 @@ namespace FDNSFilePasswordChecker
             await fileProcessor.ProcessPasswordProtectedFilesAsync(logFiles, chkDeleteSourceFiles.Checked);
         }
 
-        /// <summary>
-        /// 設定確認ボタンのクリックイベントハンドラー
-        /// </summary>
-        /// <param name="sender">イベントの送信元オブジェクト</param>
-        /// <param name="e">イベント引数</param>
-        private void btnCheckConfig_Click(object sender, EventArgs e)
-        {
-            string workingDirectory = AppConfigurationManager.GetWorkingDirectory();
-            var processExecutor = new ProcessExecutor(workingDirectory);
-            
-            if (processExecutor.ValidateConfiguration())
-            {
-                MessageBox.Show("設定は正常です。\n\n必要なファイルがすべて配置されています。\n\nデフォルト動作：選択フォルダからファイルを移動\nチェック時：選択フォルダにコピー", "設定確認", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
-
+        
         /// <summary>
         /// 入力値の検証を行う
         /// </summary>
